@@ -1,4 +1,4 @@
 package com.nthmaxfinder.model;
 
-public class ApiErrorResponse {
+public record ApiErrorResponse(String error) {
 }

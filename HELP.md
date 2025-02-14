@@ -13,7 +13,7 @@
 
 **Клонируйте репозиторий**  
 
-git clone https://github.com/your-repository/NthMaxFinder.git
+git clone https://github.com/patrakhin/NthMaxFinder.git
 cd NthMaxFinder
 
 

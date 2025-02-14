@@ -1,9 +1,9 @@
 package com.nthmaxfinder.service;
 
-import com.nthmaxfinder.exception.FileProcessingException;
+import com.nthmaxfinder.util.ExcelParser;
 import com.nthmaxfinder.exception.InvalidInputException;
 import org.springframework.stereotype.Service;
-
+import java.math.BigInteger;
 import java.util.PriorityQueue;
 import java.util.List;
 
@@ -16,27 +16,32 @@ public class NthMaxService {
         this.excelParser = excelParser;
     }
 
-    public int findNthMax(String filePath, int n) {
+    public BigInteger findNthMax(String filePath, int n) {
         if (n <= 0) {
             throw new InvalidInputException("N должно быть больше 0");
         }
 
-        List<Integer> numbers = excelParser.parseExcelFile(filePath);
+        List<BigInteger> numbers = excelParser.parseExcelFile(filePath);
 
         if (numbers.size() < n) {
             throw new InvalidInputException("Файл содержит меньше " + n + " чисел");
         }
 
-        // Используем Min Heap (куча)
-        PriorityQueue<Integer> minHeap = new PriorityQueue<>(n);
+        // Используем Min Heap (кучу) для BigInteger
+        PriorityQueue<BigInteger> minHeap = new PriorityQueue<>(n);
 
-        for (int num : numbers) {
+        for (BigInteger num : numbers) {
             if (minHeap.size() < n) {
                 minHeap.add(num);
-            } else if (num > minHeap.peek()) {
+            } else if (num.compareTo(minHeap.peek()) > 0) {
                 minHeap.poll();
                 minHeap.add(num);
             }
+        }
+
+        // Проверяем, что куча не пуста перед вызовом peek
+        if (minHeap.isEmpty()) {
+            throw new InvalidInputException("Ошибка: не удалось найти N-е максимальное число");
         }
 
         return minHeap.peek();
