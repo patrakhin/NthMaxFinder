@@ -1,6 +1,7 @@
 package com.nthmaxfinder.controller;
 
 import com.nthmaxfinder.service.NthMaxService;
+import com.nthmaxfinder.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,14 +34,29 @@ public class NthMaxController {
                     @ApiResponse(responseCode = "500", description = "Ошибка сервера")
             }
     )
-    public ResponseEntity<BigInteger> getNthMax(
+    public ResponseEntity<Object> getNthMax(
             @Parameter(description = "Путь к файлу XLSX", example = "/path/to/file.xlsx")
             @RequestParam String filePath,
 
             @Parameter(description = "Какое по счету максимальное число искать", example = "3")
-            @RequestParam int n) {
+            @RequestParam String n) {
 
-        BigInteger result = nthMaxService.findNthMax(filePath, n);
-        return ResponseEntity.ok(result);
+        try {
+            // Преобразуем строку в целое число
+            int number = Integer.parseInt(n);
+
+            // Логика поиска N-го максимального числа
+            BigInteger result = nthMaxService.findNthMax(filePath, number);
+            return ResponseEntity.ok(result);
+
+        } catch (NumberFormatException ex) {
+            // В случае ошибки преобразования числа
+            ErrorResponse errorResponse = new ErrorResponse("Некорректный ввод данных");
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception ex) {
+            // Обработка других возможных ошибок
+            ErrorResponse errorResponse = new ErrorResponse("Ошибка сервера");
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 }
